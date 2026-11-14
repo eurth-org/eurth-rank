@@ -6,7 +6,7 @@ Three parts: what comes next, what each release added (newest first), and what's
 
 ## Where to pick up
 
-**14 November 2026.** The brief is saved, the repository exists, and this plan is written. Nothing is built. The plan is waiting for Stijn's go-ahead; the next step is Phase 1, step 1.
+**15 November 2026.** Stijn gave the go-ahead. The site is scaffolded from the starter template (@eurth/style 1.0.1) and the engine is written and tested in `src/rank/`: steps 1 to 12 and 14. Next: the guide and glossary (step 13), then the pages and the builder (steps 15 to 19).
 
 What the plan was written against:
 
