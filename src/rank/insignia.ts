@@ -11,7 +11,7 @@
  */
 import { contrast } from '@eurth/style';
 import { describeInsignia } from './describe';
-import { bar, chevron, CHEVRON, crown, CROWN, curl, CURL, emblem, EMBLEM, emu, EMU, pip, PIP, rocker, ROCKER, star, STAR, wreath, WREATH, type Paint } from './elements';
+import { bar, chevron, CHEVRON, crown, CROWN, curl, CURL, emblem, EMBLEM, emblemImage, emu, EMU, pip, PIP, rocker, ROCKER, star, STAR, wreath, WREATH, type Paint } from './elements';
 import { metalColours, type Branch, type Element, type Force, type Rank, type Wear } from './model';
 import { isEmuCommander } from './validate';
 
@@ -73,7 +73,7 @@ function repeated(count: number, width: number, height: number, across: boolean,
   };
 }
 
-function block(element: Element, across: boolean, options: InsigniaOptions, emus: boolean): Block {
+function block(element: Element, across: boolean, emblemId: string | undefined, emus: boolean): Block {
   const { kind, count } = element;
   switch (kind) {
     case 'pip':
@@ -85,7 +85,7 @@ function block(element: Element, across: boolean, options: InsigniaOptions, emus
     case 'wreath':
       return repeated(count, WREATH.width, WREATH.height, across, wreath);
     case 'emblem':
-      return repeated(count, EMBLEM, EMBLEM, across, (paint) => emblem(paint, options.emblem));
+      return repeated(count, EMBLEM, EMBLEM, across, (paint) => emblem(paint, emblemId));
     case 'bar':
     case 'ring': {
       const each = kind === 'ring' ? (element.wide ? 30 : 12) : element.wide ? 14 : 7;
@@ -120,6 +120,8 @@ function block(element: Element, across: boolean, options: InsigniaOptions, emus
 export interface InsigniaOptions {
   /** The nation's arms or flag, as a data address from @eurth/profile's svgDataUrl(). */
   emblem?: string;
+  /** For a drawing inside a bigger one: the id of an emblem image the bigger one has defined. */
+  emblemId?: string;
   /** The colour of the cloth's edge when the branch has no piping. */
   edge?: string;
   /** Put before the ids of the title and description, when a page or picture holds several. */
@@ -148,7 +150,7 @@ export function drawInsignia(branch: Branch, rank: Rank, options: InsigniaOption
   const across = c.flow === 'across';
   const paint = paintFor(branch);
   const emus = isEmuCommander(rank.name);
-  const blocks = rank.elements.map((element) => block(element, across, options, emus));
+  const blocks = rank.elements.map((element) => block(element, across, options.emblemId, emus));
 
   // How long the stack is, how thick it is, and so how much smaller it must be drawn to fit.
   const along = blocks.reduce((sum, b) => sum + (across ? (b.full ? c.fullWidth : b.width) : b.height), 0) + GAP * Math.max(0, blocks.length - 1);
@@ -180,11 +182,12 @@ export function drawInsignia(branch: Branch, rank: Rank, options: InsigniaOption
 
 /** One insignia as a file: an SVG with a clear ground, ready for a wiki or a document. */
 export function insigniaSvg(force: Force, branch: Branch, rank: Rank, options: InsigniaOptions = {}): string {
-  const drawn = drawInsignia(branch, rank, options);
   const ids = options.idPrefix ?? 'rank';
+  const carries = options.emblem !== undefined && rank.elements.some((e) => e.kind === 'emblem');
+  const drawn = drawInsignia(branch, rank, { ...options, emblemId: carries ? `${ids}-emblem` : undefined });
   const title = [rank.name || 'Unnamed rank', rank.code].filter(Boolean).join(', ');
   return (
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${drawn.width} ${drawn.height}" width="${drawn.width}" height="${drawn.height}" role="img" aria-labelledby="${ids}-title ${ids}-desc">` +
-    `<title id="${ids}-title">${escapeXml(title)}</title><desc id="${ids}-desc">${escapeXml(describeInsignia(force, branch, rank))}</desc>${drawn.body}</svg>`
+    `<title id="${ids}-title">${escapeXml(title)}</title><desc id="${ids}-desc">${escapeXml(describeInsignia(force, branch, rank))}</desc>${carries ? emblemImage(`${ids}-emblem`, escapeXml(options.emblem!)) : ''}${drawn.body}</svg>`
   );
 }

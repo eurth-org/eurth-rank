@@ -1,0 +1,86 @@
+---
+// A row of insignia with a caption, for the guide. Each picture is drawn at build time by the
+// same code the builder uses, shown as an image, and described in its alternative text.
+import { figureById, figureRanks } from '../content/figures';
+import { describeInsignia } from '../rank/describe';
+import { insigniaSvg } from '../rank/insignia';
+
+interface Props {
+  /** Which figure, from src/content/figures.ts. */
+  id: string;
+}
+const figure = figureById(Astro.props.id);
+const shown = figureRanks(figure).map(({ force, branch, rank }, i) => {
+  const svg = insigniaSvg(force, branch, rank, { idPrefix: `${figure.id}-${i}` });
+  const [, width, height] = /viewBox="0 0 (\d+) (\d+)"/.exec(svg) ?? [];
+  return {
+    src: `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`,
+    alt: describeInsignia(force, branch, rank),
+    width: Number(width),
+    height: Number(height),
+    name: rank.name,
+    code: rank.code,
+    branch: figure.from.length > 1 ? branch.name : '',
+  };
+});
+---
+
+<figure class="figure">
+  <ul>
+    {
+      shown.map((item) => (
+        <li>
+          <img src={item.src} alt={item.alt} width={item.width} height={item.height} loading="lazy" />
+          <span class="name">{item.name}</span>
+          <span class="eu-data eu-muted">{[item.branch, item.code].filter(Boolean).join(' · ')}</span>
+        </li>
+      ))
+    }
+  </ul>
+  <figcaption class="eu-help">{figure.caption}</figcaption>
+</figure>
+
+<style>
+  .figure {
+    margin: var(--space-4) 0;
+    padding: var(--space-4);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-md);
+    background: var(--surface-raised);
+  }
+
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: var(--space-4) var(--space-6);
+    margin: 0 0 var(--space-3);
+    padding: 0;
+    list-style: none;
+  }
+
+  li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-1);
+    margin: 0;
+    text-align: center;
+  }
+
+  img {
+    display: block;
+    width: auto;
+    height: 150px;
+    max-width: 150px;
+    object-fit: contain;
+  }
+
+  .name {
+    font: var(--type-label);
+  }
+
+  figcaption {
+    margin: 0;
+  }
+</style>

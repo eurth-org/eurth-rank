@@ -72,14 +72,17 @@ export const EMBLEM = 48;
 /**
  * The nation's emblem: its arms or flag from the profile, inside a ring. Without one, a plain
  * disc stands in. The picture only ever arrives as a data address made by @eurth/profile, and is
- * shown as an image, never as markup.
+ * shown as an image (see emblemImage), never as markup.
  */
-export function emblem(paint: Paint, image?: string): string {
+export function emblem(paint: Paint, imageId?: string): string {
   const ring = `<circle r="21" fill="none" stroke="${paint.fill}" stroke-width="3"/>`;
   const outline = paint.outline ? `<circle r="22.8" fill="none" stroke="${paint.outline}" stroke-width="1.2"/>` : '';
-  const middle = image ? `<image x="-15" y="-15" width="30" height="30" preserveAspectRatio="xMidYMid meet" href="${image}"/>` : `<circle r="9" ${filled(paint)}/>`;
+  const middle = imageId ? `<use href="#${imageId}" x="-15" y="-15"/>` : `<circle r="9" ${filled(paint)}/>`;
   return outline + ring + middle;
 }
+
+/** The emblem's picture, defined once in a drawing and used wherever a rank carries it. */
+export const emblemImage = (id: string, href: string): string => `<defs><image id="${id}" width="30" height="30" preserveAspectRatio="xMidYMid meet" href="${href}"/></defs>`;
 
 /** A bar: a stripe of a given width. */
 export const bar = (width: number, height: number, paint: Paint): string => `<rect x="${n(-width / 2)}" y="${n(-height / 2)}" width="${n(width)}" height="${n(height)}" ${filled(paint)}/>`;

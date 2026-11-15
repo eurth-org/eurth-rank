@@ -1,0 +1,207 @@
+---
+// The guide: how rank systems are built and how insignia show seniority, with sources and the
+// day it was last brought up to date. Its figures come from src/content/figures.ts and are drawn
+// by the builder's own code; the table of codes comes from src/rank/nato.ts.
+import { article, wikipedia } from '@eurth/style/build';
+import Page from '@eurth/style/components/Page.astro';
+import { site } from '../../eurth.config.mjs';
+import Figure from '../components/Figure.astro';
+import { gradeNames } from '../rank/model';
+import { nato } from '../rank/nato';
+
+const updated = '2026-11-15';
+const headline = 'How military ranks and insignia work';
+const description = 'How rank systems are built, how insignia show who outranks whom, and how army and navy traditions differ: a guide for worldbuilders, with sources.';
+const wiki = (title: string) => wikipedia(title, site.host);
+---
+
+<Page site={site} title={headline} description={description} crumbs={[{ name: 'Guide', path: '/guide/' }]} jsonld={[article(site, { headline, path: '/guide/', description, updated })]}>
+  <article class="eu-prose">
+    <p class="eu-kicker">Guide</p>
+    <h1>{headline}</h1>
+    <p class="eu-lead">
+      A rank says who gives the orders. An insignia says it at twenty paces, in the rain, to someone who has never met you. This guide covers how both are put
+      together, so the forces you invent look as if they grew that way.
+    </p>
+
+    <h2 id="grades">Three grades, and a gap between two of them</h2>
+    <p>
+      Almost every armed force sorts its people into the same three layers. At the bottom are the <a href="/glossary/#enlisted">enlisted</a>: privates, seamen,
+      airmen, who do the work. Above them are the <a href="/glossary/#non-commissioned-officer">non-commissioned officers</a>, corporals and sergeants promoted
+      from the ranks, who see that the work is done. At the top are the <a href="/glossary/#commissioned-officer">commissioned officers</a>, who decide what the
+      work is.
+    </p>
+    <p>
+      The line between the top two is the one that matters. An officer holds a <a href="/glossary/#commission">commission</a>, a document from the head of state
+      that gives authority to command; a sergeant with thirty years’ service is still outranked by a lieutenant with thirty days’. Many forces put
+      <a href="/glossary/#warrant-officer">warrant officers</a> in the gap: specialists and senior soldiers who rank above every sergeant and below every officer.
+    </p>
+    <p>
+      Officers have layers of their own. <a href="/glossary/#junior-officer">Junior officers</a> lead platoons and companies,
+      <a href="/glossary/#field-officer">field officers</a> lead battalions and regiments, and <a href="/glossary/#general-officer">general officers</a> lead
+      everything larger. Insignia nearly always change style at each of those two steps, as you will see below.
+    </p>
+
+    <h2 id="nato">The NATO codes: a ruler to measure against</h2>
+    <p>
+      When allies with different ladders had to work together, they needed to know whose major was whose. NATO’s answer is a standard, STANAG 2116, that gives
+      every rank a <a href="/glossary/#nato-code">code</a>: OF-1 to OF-10 for officers and OR-1 to OR-9 for other ranks, with a higher number for a higher rank.
+      The codes are a ruler, not a rule. Few forces fill every one, many put two ranks in one code, and a fictional force can ignore them altogether. They are
+      useful all the same, because they tell a reader at once where a rank they have never heard of sits.
+    </p>
+    <div class="eu-scroll" tabindex="0" role="group" aria-label="The NATO codes. The table scrolls sideways on a small screen.">
+      <table>
+        <caption>The NATO codes, with the usual English names in each service</caption>
+        <thead>
+          <tr>
+            <th scope="col">Code</th>
+            <th scope="col">Grade</th>
+            <th scope="col">Army</th>
+            <th scope="col">Navy</th>
+            <th scope="col">Air force</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            nato.map((row) => (
+              <tr>
+                <th scope="row" class="eu-data">
+                  {row.code}
+                </th>
+                <td>{gradeNames[row.grade]}</td>
+                <td>{row.army[0]}</td>
+                <td>{row.navy[0]}</td>
+                <td>{row.air[0]}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+    <p>
+      The names are the ones a new ladder starts with in the <a href="/">builder</a>, and every one can be changed. The code stays beside each rank as a
+      reference column, so your Grand Marshal of the Western Reach can still be read as an OF-9.
+    </p>
+
+    <h2 id="seniority">How insignia show seniority</h2>
+    <p>Designers of insignia have only a few tricks, and every real system is a mixture of them. Knowing the tricks is most of designing your own.</p>
+
+    <h3>More</h3>
+    <p>The simplest rule: more of something outranks less of it. One <a href="/glossary/#pip">pip</a>, two pips, three pips.</p>
+    <Figure id="more" />
+
+    <h3>Better</h3>
+    <p>
+      Counting runs out quickly; nobody can tell six pips from seven across a parade ground. So after three or four of one <a href="/glossary/#device">device</a>
+      comes a different, grander one, and the count starts again beneath it. In the Commonwealth pattern a <a href="/glossary/#crown">crown</a> outranks any
+      number of pips.
+    </p>
+    <Figure id="better" />
+    <p>
+      The American pattern does the same with a longer ladder of devices, each one outranking all of the one before. The real one runs bar, oak leaf, eagle,
+      star; ours uses a wreath and your nation’s emblem in the middle.
+    </p>
+    <Figure id="ladder-of-devices" />
+
+    <h3>Wider</h3>
+    <p>
+      Navies count in <a href="/glossary/#sleeve-ring">rings</a> of gold <a href="/glossary/#lace">lace</a> round the cuff. When four rings are not enough, the
+      bottom ring becomes a broad one, and the count begins again above it. Shoulder boards use the same idea when they gain braid along their length for senior
+      ranks.
+    </p>
+    <Figure id="wider" />
+
+    <h3>Somewhere else</h3>
+    <p>
+      Where an insignia is worn says as much as what is on it. In most armies officers wear rank on the shoulder and everyone else on the sleeve, so the grade can
+      be read before the rank. <a href="/glossary/#chevron">Chevrons</a> are the sleeve’s own language: one for the first step up, three for a sergeant, and a
+      <a href="/glossary/#rocker">rocker</a> or a crown added for the senior sergeants.
+    </p>
+    <Figure id="chevrons" />
+
+    <h3>Two things at once</h3>
+    <p>
+      Some systems split the message. In the Eastern pattern the stripes across the shoulder board give the grade (one for junior officers, two for field
+      officers, none for generals) and the stars give the rank within it. A major and a major general both wear one star; the board beneath it tells them apart.
+    </p>
+    <Figure id="grade-and-rank" />
+
+    <h3>Colour and metal</h3>
+    <p>
+      Colour rarely carries rank, because colour fades, and because some of the people reading it are colour blind. It carries belonging instead: the
+      <a href="/glossary/#cloth">cloth</a> matches the uniform, and <a href="/glossary/#piping">piping</a> in an
+      <a href="/glossary/#arm-of-service-colour">arm-of-service colour</a> says artillery or infantry or medical corps. <a href="/glossary/#metal">Metal</a> is the
+      exception: gold for one branch and silver for another is common, and a few systems tell neighbouring ranks apart by metal alone, which is why a silver bar
+      can outrank a gold one.
+    </p>
+
+    <h2 id="traditions">Army and navy traditions compared</h2>
+    <p>
+      Armies and navies grew their ranks separately, and it shows. An army’s ranks come from the regiment. The colonel led the column (Italian
+      <i lang="it">colonnello</i>), a lieutenant stood in for his captain (French <i lang="fr">lieu tenant</i>, “place holder”), and the sergeant major was the
+      senior sergeant of the whole. That last one explains an old puzzle: a lieutenant general outranks a major general because the major general was once the
+      sergeant major general, a step below the captain general’s lieutenant.
+    </p>
+    <p>
+      A navy’s ranks come from the ship. Its captain is whoever commands a vessel, which is a far bigger job than commanding a company of a hundred soldiers. So
+      the two captains are three steps apart, and a naval lieutenant is the equal of an army captain.
+    </p>
+    <Figure id="captains" />
+    <p>The insignia differ as much as the names.</p>
+    <ul>
+      <li>
+        <strong>Armies</strong> wear rank on the shoulder for officers and on the sleeve for the rest. British officers have worn pips and crowns on the shoulder
+        since 1880; chevrons for corporals and sergeants date from 1802. British chevrons point down. American ones have pointed up since 1902.
+      </li>
+      <li>
+        <strong>Navies</strong> wear rings on the cuff. The Royal Navy settled its rings in 1856 and added the loop on the top ring, the
+        <a href="/glossary/#curl">curl</a>, which half the world’s navies have since copied; many others put a star above the rings in its place.
+        <a href="/glossary/#petty-officer">Petty officers</a> wear a badge on the upper arm, usually with an anchor or an eagle.
+      </li>
+      <li>
+        <strong>Air forces</strong> are young, so each had to choose a parent. Britain’s Royal Air Force, formed in 1918, took naval rings and invented titles of
+        its own the following year (a wing commander is the equal of a naval commander). The United States Air Force, independent since 1947, kept the army’s
+        ranks and devices. A fictional air force can believably do either, or wear its rank on the collar as several continental ones did.
+      </li>
+    </ul>
+    <Figure id="collar" />
+
+    <h2 id="design">Designing your own</h2>
+    <ol>
+      <li><strong>Start from the codes you need.</strong> A small state has no use for an OF-10. Leave gaps; real ladders do.</li>
+      <li><strong>Pick two or three devices and a rule.</strong> “Pips, then a crown, then a wreath” is a system. Nine different devices is a costume.</li>
+      <li><strong>Change something at each layer.</strong> Sleeve to shoulder at the commission; plain to wreathed at field rank; a broad ring or a star for generals.</li>
+      <li><strong>Let history show.</strong> A republic that was once a kingdom might have swapped its crowns for stars and kept everything else.</li>
+      <li><strong>Check it at a glance.</strong> If two neighbouring ranks are hard to tell apart on the ladder chart, they will be impossible on a uniform. The builder tells you when two ranks wear the same thing.</li>
+    </ol>
+    <p>
+      Open the <a href="/">builder</a>, or begin from one of the <a href="/templates/">templates</a>. The <a href="/glossary/">glossary</a> explains the words.
+      When the ladder looks right, give it a country: <a href="https://eurth.org">Eurth</a> has a world for it to defend.
+    </p>
+
+    <h2 id="sources">Sources</h2>
+    <ul>
+      <li><a href={wiki('Ranks and insignia of NATO')}>Ranks and insignia of NATO</a>, Wikipedia: the codes of STANAG 2116 and how member states map onto them.</li>
+      <li><a href={wiki('Military rank')}>Military rank</a>, Wikipedia: the grades, and where the names came from.</li>
+      <li><a href={wiki('Chevron (insignia)')}>Chevron (insignia)</a>, Wikipedia: the history of chevrons, and which way they point.</li>
+      <li><a href={wiki('British Army officer rank insignia')}>British Army officer rank insignia</a>, Wikipedia: pips and crowns, and the move to the shoulder in 1880.</li>
+      <li><a href={wiki('Royal Navy officer rank insignia')}>Royal Navy officer rank insignia</a>, Wikipedia: sleeve rings and the curl of 1856.</li>
+      <li><a href={wiki('RAF officer ranks')}>RAF officer ranks</a>, Wikipedia: how an air force built its ranks on naval ones in 1919.</li>
+      <li><a href={wiki('United States Army enlisted rank insignia')}>United States Army enlisted rank insignia</a>, Wikipedia: chevrons, rockers and the change of direction in 1902.</li>
+      <li><a href={wiki('Warrant officer')}>Warrant officer</a> and <a href={wiki('Non-commissioned officer')}>Non-commissioned officer</a>, Wikipedia.</li>
+      <li><a href={wiki('Waffenfarbe')}>Waffenfarbe</a>, Wikipedia: arm-of-service colours as piping.</li>
+    </ul>
+    <p class="eu-muted">Last updated <time datetime={updated}>15 November 2026</time>.</p>
+  </article>
+</Page>
+
+<style>
+  h2,
+  h3 {
+    scroll-margin-top: var(--space-8);
+  }
+
+  table {
+    min-width: 560px;
+  }
+</style>

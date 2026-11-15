@@ -1,0 +1,105 @@
+---
+// Templates: ready-made ladders, each a link into the builder. The links and the charts are
+// made at build time with the same code the builder uses, so they can never drift apart.
+import Page from '@eurth/style/components/Page.astro';
+import { site } from '../../eurth.config.mjs';
+import { ladderChart } from '../rank/chart';
+import { summariseLadder } from '../rank/describe';
+import { encodeForce, LINK_PARAM } from '../rank/link';
+import { rankCount } from '../rank/model';
+import { templates } from '../rank/templates';
+
+const cards = templates.map((template) => {
+  const { force } = template;
+  const first = force.branches[0]!;
+  const chart = ladderChart(force, first, { idPrefix: `template-${template.id}` });
+  return {
+    ...template,
+    href: `/?${LINK_PARAM}=${encodeForce(force)}`,
+    picture: `data:image/svg+xml;charset=utf-8,${encodeURIComponent(chart.svg)}`,
+    width: chart.width,
+    height: chart.height,
+    alt: summariseLadder(force, first),
+    branches: force.branches.map((b) => `${b.name} (${b.ranks.length})`).join(', '),
+    ranks: rankCount(force),
+    shown: first.name,
+  };
+});
+---
+
+<Page
+  site={site}
+  title="Rank and insignia templates"
+  description="Five ready-made rank ladders to start from, in the Commonwealth, American, Continental and Eastern patterns, each with its insignia drawn. Open one and make it yours."
+  crumbs={[{ name: 'Templates', path: '/templates/' }]}
+>
+  <div class="eu-stack">
+    <header class="eu-prose">
+      <p class="eu-kicker">Templates</p>
+      <h1>Rank and insignia templates</h1>
+      <p class="eu-lead">
+        Five invented nations, each following a pattern real forces use. Open one in the <a href="/">builder</a> and change what you like: the names, the cloth,
+        every pip. The <a href="/guide/">guide</a> explains why each pattern looks the way it does.
+      </p>
+    </header>
+    <ul class="gallery">
+      {
+        cards.map((card) => (
+          <li class="eu-card">
+            <h2>
+              {card.name}
+              <span class="eu-muted">{card.force.nation}</span>
+            </h2>
+            <p>{card.note}</p>
+            <div class="eu-scroll chart" tabindex="0" role="group" aria-label={`The ${card.shown} of ${card.force.nation}. The chart scrolls sideways on a small screen.`}>
+              <img src={card.picture} alt={card.alt} width={card.width} height={card.height} loading="lazy" />
+            </div>
+            <p class="eu-help">
+              {card.ranks} ranks in {card.force.branches.length} {card.force.branches.length === 1 ? 'branch' : 'branches'}: {card.branches}. The chart shows the {card.shown}.
+            </p>
+            <p>
+              <a class="eu-btn" href={card.href}>
+                Open {card.force.nation} in the builder
+              </a>
+            </p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</Page>
+
+<style>
+  .gallery {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  h2 {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-1) var(--space-3);
+    font: var(--type-subtitle);
+  }
+
+  h2 span {
+    font: var(--type-body);
+  }
+
+  .chart {
+    border-radius: var(--radius-md);
+  }
+
+  .chart img {
+    display: block;
+    width: 100%;
+    min-width: 720px;
+    height: auto;
+    border-radius: var(--radius-md);
+  }
+</style>

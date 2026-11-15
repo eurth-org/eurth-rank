@@ -1,0 +1,79 @@
+---
+// The builder, and under it what search engines and newcomers both want: what it is, how to use
+// it, and answers to the usual questions (also given to search engines as structured data).
+import { faqPage, webApplication } from '@eurth/style/build';
+import Page from '@eurth/style/components/Page.astro';
+import { site } from '../../eurth.config.mjs';
+import Builder from '../ui/Builder.svelte';
+
+const faq = [
+  { q: 'Is Rank free?', a: 'Yes. There is no account, no watermark and no paid tier. It is made by the Eurth worldbuilding community for anyone who needs it.' },
+  {
+    q: 'Where is my rank ladder saved?',
+    a: 'In its link. The link holds every branch, rank and insignia, so copying the link is saving it. You can also download the pictures, or save your nation as a profile file that the other Eurth tools can read. Nothing is kept in your browser or on a server.',
+  },
+  {
+    q: 'What are the NATO codes for?',
+    a: 'They are a common scale, OF-1 to OF-10 for officers and OR-1 to OR-9 for other ranks, that lets a reader see where a rank they have never heard of sits. Your names are your own; the code beside each is only a reference, and you can leave it empty.',
+  },
+  {
+    q: 'Can I use the insignia on a wiki?',
+    a: 'Yes. Copy the wikitext for a table of every rank, and download the zip of every insignia: the files in the zip have exactly the names the table points at, so uploading them fills the table in.',
+  },
+  { q: 'Does it work offline, and on a phone?', a: 'Yes to both. After the first visit the site keeps a copy of itself on your device and opens without a connection.' },
+];
+---
+
+<Page
+  site={site}
+  jsonld={[
+    webApplication(site, {
+      featureList: ['Army, navy, air force and custom branches', 'Rank ladders mapped to NATO codes', 'Shoulder boards, sleeve insignia and collar patches', 'Ladder chart', 'SVG, PNG and WebP downloads', 'Wikitext rank table and CSV', 'Nation profile file'],
+    }),
+    faqPage(faq),
+  ]}
+>
+  <div class="eu-stack">
+    <header class="eu-stack intro">
+      <p class="eu-kicker">Rank, by Eurth</p>
+      <h1>Rank insignia for your forces</h1>
+      <p class="eu-lead">Build the ladder of ranks for your nation’s army, navy and air force, and draw what each one wears. Free, in your browser, no account needed.</p>
+    </header>
+
+    <!-- client:load draws the builder as real HTML first, then wakes it up. -->
+    <Builder client:load siteName={site.name} siteUrl={site.url} />
+
+    <section class="eu-prose">
+      <h2>How it works</h2>
+      <ol>
+        <li>Name your nation and pick a branch. Each starts with a full ladder, from recruit to marshal, that you can rename, reorder and cut down.</li>
+        <li>Choose a rank and build its insignia: where it is worn, and what is on it. Pips, stars, crowns, wreaths, bars, chevrons and sleeve rings stack by themselves.</li>
+        <li>Give the branch its cloth and its metal, then take the ladder chart with you: as a link, a picture, a wiki table or your nation’s profile file.</li>
+      </ol>
+      <p>
+        New to ranks? The <a href="/guide/">guide</a> explains how insignia show who outranks whom, the <a href="/glossary/">glossary</a> has the words, and the
+        <a href="/templates/">templates</a> give you a whole force to start from.
+      </p>
+
+      <h2>Questions</h2>
+      <dl>
+        {
+          faq.map((item) => (
+            <>
+              <dt>{item.q}</dt>
+              <dd>{item.a}</dd>
+            </>
+          ))
+        }
+      </dl>
+    </section>
+  </div>
+
+  <Fragment slot="inspirations">Rank owes its comparison chart to the tables NATO forces use to read each other’s uniforms.</Fragment>
+</Page>
+
+<style>
+  .intro {
+    gap: var(--space-2);
+  }
+</style>

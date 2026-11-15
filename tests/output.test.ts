@@ -80,8 +80,15 @@ describe('an insignia', () => {
   it('shows the nation’s emblem as an image, never as markup', () => {
     const data = 'data:image/svg+xml;base64,PHN2Zz48L3N2Zz4=';
     const svg = insigniaSvg(aldermoor, army, made('shoulder', 'e1'), { emblem: data });
-    expect(svg).toContain(`<image x="-15" y="-15" width="30" height="30" preserveAspectRatio="xMidYMid meet" href="${data}"/>`);
+    expect(svg).toContain(`<defs><image id="rank-emblem" width="30" height="30" preserveAspectRatio="xMidYMid meet" href="${data}"/></defs>`);
+    expect(svg).toContain('<use href="#rank-emblem" x="-15" y="-15"/>');
     expect(insigniaSvg(aldermoor, army, made('shoulder', 'e1'))).not.toContain('<image');
+    expect(insigniaSvg(aldermoor, army, made('shoulder', 'p1'), { emblem: data })).not.toContain('<image');
+    // A chart defines the picture once, however many ranks carry it.
+    const chart = ladderChart(aldermoor, army, { emblem: data }).svg;
+    expect(chart.match(/<image /g)).toHaveLength(1);
+    expect(chart.match(/<use href="#ladder-emblem"/g)).toHaveLength(army.ranks.filter((r) => r.elements.some((e) => e.kind === 'emblem')).length);
+    expect(insigniaSvg(aldermoor, army, made('shoulder', 'e1'), { emblem: 'x"><script>' })).not.toContain('<script>');
   });
 
   it('escapes whatever was typed', () => {

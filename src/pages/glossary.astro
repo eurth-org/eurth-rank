@@ -1,0 +1,58 @@
+---
+// The glossary: each term has an id to link to, and the whole set is given to search engines
+// as a DefinedTermSet. The words live in src/content/glossary.ts.
+import { definedTermSet } from '@eurth/style/build';
+import Page from '@eurth/style/components/Page.astro';
+import { site } from '../../eurth.config.mjs';
+import { glossary, termById } from '../content/glossary';
+
+const title = 'Glossary of rank and insignia terms';
+---
+
+<Page
+  site={site}
+  title={title}
+  description={`${glossary.length} words of military rank and insignia, a sentence or two each: chevron, commission, flag officer, NATO code, pip, rocker, sleeve ring, warrant officer and more.`}
+  crumbs={[{ name: 'Glossary', path: '/glossary/' }]}
+  jsonld={[definedTermSet(site, { name: title, path: '/glossary/', terms: glossary.map(({ id, term, definition }) => ({ id, term, definition })) })]}
+>
+  <article class="eu-prose">
+    <p class="eu-kicker">Glossary</p>
+    <h1>{title}</h1>
+    <p class="eu-lead">
+      The words of ranks and the things that show them, a sentence or two each. The <a href="/guide/">guide</a> shows how they fit together, the
+      <a href="/templates/">templates</a> show them at work, and the <a href="/">builder</a> is where you use them.
+    </p>
+    <dl>
+      {
+        glossary.map((entry) => (
+          <>
+            <dt id={entry.id}>{entry.term}</dt>
+            <dd>
+              {entry.definition}
+              {entry.see?.length ? (
+                <span class="eu-muted">
+                  {' '}
+                  See also{' '}
+                  {entry.see.map((id, i) => (
+                    <>
+                      {i > 0 && (i === entry.see!.length - 1 ? ' and ' : ', ')}
+                      <a href={`#${id}`}>{termById(id)!.term.toLowerCase().replace('nato', 'NATO')}</a>
+                    </>
+                  ))}
+                  .
+                </span>
+              ) : null}
+            </dd>
+          </>
+        ))
+      }
+    </dl>
+  </article>
+</Page>
+
+<style>
+  dt {
+    scroll-margin-top: var(--space-8);
+  }
+</style>
