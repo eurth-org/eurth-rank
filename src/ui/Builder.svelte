@@ -192,7 +192,12 @@
     if (!b || !r) return;
     const drawn = drawInsignia(b, r);
     const centre = element === undefined ? drawn.centres.at(-1) : drawn.centres.findLast((c) => c.element === element);
-    if (centre && !calm()) spark = { x: (centre.x / drawn.width) * 100, y: (centre.y / drawn.height) * 100, key: Date.now() };
+    if (centre && !calm()) {
+      const key = Date.now();
+      spark = { x: (centre.x / drawn.width) * 100, y: (centre.y / drawn.height) * 100, key };
+      // The animation's end clears it; this is for a tab in the background, where animations wait.
+      setTimeout(() => spark?.key === key && (spark = null), 900);
+    }
     playTones([[1976, 0, 0.03], [2960, 0.035, 0.018]], { length: 0.12 });
   }
 
@@ -660,6 +665,10 @@
     margin: 0;
     padding: 0;
     border: 0;
+  }
+
+  .group legend {
+    padding: 0;
   }
 
   .swatches {

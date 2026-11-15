@@ -6,57 +6,47 @@ Three parts: what comes next, what each release added (newest first), and what's
 
 ## Where to pick up
 
-**15 November 2026.** Stijn gave the go-ahead. The site is scaffolded from the starter template (@eurth/style 1.0.1) and the engine is written and tested in `src/rank/`: steps 1 to 12 and 14. Next: the guide and glossary (step 13), then the pages and the builder (steps 15 to 19).
+**15 November 2026.** Version 0.1.0 is built: the engine, the four pages and the builder, with every export. Check, build, tests (126) and the accessibility check all pass locally. Nothing is deployed, and nothing will be until the launch workflow runs on 19 December. The next step is the first item under "Next".
 
-What the plan was written against:
+Worth knowing before you start:
 
-- **@eurth/style 1.0.1** is released (handbook, starter template, reusable workflows), so Phase 2 can follow Phase 1 without waiting. Rank is already in its `tools.json`: id `rank`, door 11, launch `2026-12-20T00:00:00+01:00`, pitch "Rank insignia for your forces".
-- **@eurth/profile 1.0.0** is released and already has a `rank` section: `branches` (names) and `ranks` (`name`, `branch`, highest first), plus `link`, `summary` and `updated`. No pull request is needed before building. The section allows keys of its own, so Rank will add each rank's NATO code and grade there, and keep the insignia designs under a key of its own (Phase 1, step 9). To propose to @eurth/profile afterwards, so the schema describes them.
-
-Open questions for Stijn (none blocks Phase 1):
-
-- **The wiki table.** The plan exports a plain wikitable per branch (code, insignia file name, rank, abbreviation) and one comparison table across branches. If IIWiki has rank templates of its own that you would rather fill, say which.
-- **Real-world patterns.** The templates are "in the pattern of" (Commonwealth, American, Continental, Eastern, and so on) with fictional names for the nations, and every element is our own drawing. No real nation's insignia is copied line for line. Say so if you want named real armies instead.
+- Astro needs Node 22.23 or later. On Stijn's machine the default Node is older; `export PATH=/opt/homebrew/opt/node@26/bin:$PATH` first.
+- `npm test` reads `dist/`, so run `npm run build` before it.
 
 ## Next
 
-### Phase 1: the engine and the words (needs nothing from @eurth/style)
+### Before the door opens
 
-Plain TypeScript in `src/rank/`, content in `src/content/`, tests in `tests/`, as Flagwright keeps its engine in `src/flag/`. Only TypeScript and Vitest are installed. Commit and push after each step.
+1. **Look at the Lighthouse numbers.** CI runs Lighthouse on `main`; it hasn't been looked at yet. The start page carries the ladder's pictures in its HTML (about 28 KB gzipped), which should be fine, but check.
+2. **Try it by hand on a phone and with a screen reader.** The automated checks pass; nobody has used it yet.
+3. **Propose Rank's extra keys to @eurth/profile**, so the schema describes them: on each rank `code`, `grade` and `abbr`; on the section `format` and `design`. The schema allows them already, so nothing is blocked.
+4. **Stijn's two questions** (neither blocks the launch):
+   - The wiki export is a plain wikitable per branch and one comparison table. If IIWiki has rank templates you would rather fill, say which.
+   - The templates are "in the pattern of" (Commonwealth, American, Continental, Eastern) with invented nations and our own drawings. Say so if you want named real armies instead.
+5. **Launch**: the workflow starts at 22:30 UTC on 19 December. If it hasn't started by 22:45 UTC, start it by hand. After the door, delete `launch.yml`.
 
-1. **Model** (`model.ts`): a force is a nation's name, its branches and their ladders.
-   - Branch: name, kind (army, navy, air force, or one the user adds: marines, gendarmerie, space force), cloth colour, metal (gold or silver), piping colour.
-   - Rank: name, abbreviation, NATO code (OR-1 to OR-9, OF-1 to OF-10, or none), and the grade it belongs to (enlisted, non-commissioned, officer), which follows from the code unless the user says otherwise. Two ranks may share a code; a code may be left empty.
-   - Insignia design per rank: where it is worn (shoulder board, sleeve, collar) and its elements in order (pips, stars, crowns, wreaths, bars, chevrons, sleeve rings, the nation's emblem), each with a count and a size.
-   - Everything that arrives from a link or a file is checked and clamped: 12 branches, 30 ranks a branch, text lengths capped, colours as hex only, unknown values dropped.
-2. **NATO codes** (`nato.ts`): the reference column. Each code with what it means and the usual army, navy and air force names for it, so a new ladder starts sensible and the guide can cite it.
-3. **Elements** (`elements.ts`): the drawings, all our own, as SVG paths on a common grid: pip, five-pointed star, crown, wreath, bar, chevron (point up or down), rocker, sleeve ring (plain or with a curl), and a plain disc where the nation's emblem goes. Also the emu, for later.
-4. **Insignia** (`insignia.ts`): one pure function from a rank's design and its branch's colours to an SVG: the shoulder board as on the mock-up (elements stacked from the button down), the sleeve (rings or chevrons on a cuff), and the collar patch. Elements are placed by rule, so six pips never spill off a board. The picture carries its own title and description.
-5. **Ladder chart** (`chart.ts`): every rank of a branch side by side, highest first, each with its code, name and insignia: the familiar comparison table as one SVG. And the comparison across branches, lined up by NATO code.
-6. **Description** (`describe.ts`): one insignia in words ("Colonel, OF-5: a shoulder board in dark green with a crown above two pips, in gold"), and a whole ladder as text, for Copy description and for screen readers.
-7. **Checks** (`validate.ts`): things worth a gentle word, none of which stops the tool: two ranks with one name, a ladder whose codes run out of order, a junior rank with more on its shoulder than its senior. Also spots the rank called "Supreme Emu Commander".
-8. **Link** (`link.ts`): the whole force in the query string, compact and versioned, in @eurth/style's form (`?d=1.…`). Past a set length the tool says so and offers the profile file instead.
-9. **Profile** (`profile.ts`): the `rank` section. What other tools read: `branches`, and `ranks` with `name` and `branch`, plus each rank's `code` and `grade`. What brings the designs back for editing: the branch colours and the insignia designs, under keys of Rank's own. It reads `arms` and `flag` and never writes them: the arms or flag becomes the emblem element (shown only through an image, as the handbook asks), and the flag's colours are offered for the branches.
-10. **Wiki table** (`wikitext.ts`): for each branch a wikitable with a row per rank (code, insignia file name, rank, abbreviation), and one table comparing the branches by code. Names are escaped for wikitext.
-11. **CSV** (`csv.ts`): branch, code, grade, rank, abbreviation and the insignia in words, a row per rank.
-12. **Templates** (`templates.ts`): ready-made ladders, each with army, navy and air force: Commonwealth pattern (crowns and pips, chevrons point down), American pattern (bars, leaves swapped for our own devices, stars; chevrons point up), Continental pattern (stars and braid), Eastern pattern (stars on striped boards), a small coast guard, and a deliberately odd one. Fictional nations throughout. A test exports every template ladder to wikitext and checks the table is complete: that is the brief's "done".
-13. **Guide and glossary** (`src/content/`): how rank systems are built (the three grades, commissions, warrant officers, why NATO made its codes), how insignia show seniority (more, bigger, higher, shinier), naval and army traditions compared (rings and curls against pips and crowns; why a navy captain outranks an army one), with sources and a last-updated date; a glossary of about 40 terms. The guide's examples are data, and the tests draw every one.
+### After launch
 
-### Phase 2: the site
-
-14. Start from the starter template in eurth-style; read HANDBOOK.md first, and where it differs from this plan, the handbook wins. `LAUNCH_AT` is `2026-12-20T00:00:00+01:00`.
-15. Pages: Builder, Templates, Guide, Glossary, with titles, descriptions, canonical links, JSON-LD, sitemap.xml, robots.txt, llms.txt and Open Graph images.
-16. The builder, as a Svelte 5 island: branches with their colours and metal; the ladder as a table with the NATO code as a reference column and names typed straight in; the insignia editor for the chosen rank (where it is worn, add and remove elements); the ladder chart underneath, live.
-17. Save and load: the link, the profile file (file picker and drag and drop, from @eurth/profile), and the emblem and colours read from the profile's arms and flag.
-18. Exports: SVG, PNG and WebP of one insignia or of the whole ladder chart in the handbook's sizes, the wikitext table, CSV, Copy link, Copy picture, Copy description, and the Share dialog.
-19. Delight: a new pip snaps on with a tiny glint (still for reduced motion, a soft click only once sound is switched on); a rank called "Supreme Emu Commander" swaps its stars for emus; the suite's own touches from @eurth/style.
-20. Offline, install, security headers, axe and Lighthouse checks, as the handbook asks.
-21. CI, nightly and the launch workflow: the scheduled run starts at 22:30 UTC on 19 December, and it also runs by hand. No custom domain and no workers.dev deploy before then.
-22. README (use, development, deployment), docs/feedback-log.md, and the handbook's checklist.
+- A picture comparing the branches side by side by NATO code (the wikitext has this table already).
+- More devices: crossed swords and batons, anchors, wings, an eagle; and diagonal sleeve stripes.
+- A lighter way to keep the insignia in view while editing the ladder on a wide screen.
+- Rank on headgear and on the chest, for forces that wear it there.
 
 ## Releases
 
-None yet.
+### 0.1.0, 15 November 2026 (built, not yet live)
+
+- **Branches**: an army, a navy and an air force to begin with, each with a full ladder; add marines, a gendarmerie, a space force, a coast guard or a branch of your own, up to twelve. Each has its cloth (twelve colours, plus your flag's), its metal (gold, silver or dark thread) and optional piping.
+- **The ladder**: up to thirty ranks a branch, highest first, with names and abbreviations typed straight in, a NATO code (OR-1 to OR-9, OF-1 to OF-10, or none) as a reference column, and a grade (officers, non-commissioned officers, enlisted) that follows the code unless set by hand.
+- **Insignia**: a shoulder board, a sleeve or a collar patch, carrying up to six elements: pips, stars, crowns, wreaths, bars, chevrons (point up or down), rockers, sleeve rings (plain, wide, or with a curl) and the nation's emblem. All drawn by us. Elements stack by rule and shrink to fit; metal gets an outline on cloth it would vanish into.
+- **The ladder chart**: every rank of a branch side by side, grouped by grade, with code, name and abbreviation.
+- **Save and load**: the whole force in the link (`?d=1.…`); the profile file's `rank` section, which keeps keys it doesn't know; a section with only names still gives a ladder. The profile's arms or flag becomes the emblem, and its flag colours are offered as cloth.
+- **Exports**: SVG, PNG and WebP of one insignia or the ladder chart (the chart in the handbook's six sizes); a wikitext table per branch and a comparison by code; a zip of every insignia under the file names the wiki table uses; CSV; Copy link, Copy picture, Copy description and the Share dialog.
+- **Checks**: a gentle note for two ranks with one name, two with the same insignia, codes out of order, a rank with no name, a branch with no ranks.
+- **Templates**: five invented nations in the Commonwealth, American, Continental and Eastern patterns, plus a coast guard and a gendarmerie. Every template ladder exports to a complete wikitext table, and a test says so.
+- **Guide and glossary**: how rank systems are built, how insignia show seniority, army and navy traditions compared, with sources; 46 terms.
+- **Delight**: a new device snaps on with a glint (and a click once sound is on); a rank called "Supreme Emu Commander" swaps its stars for emus.
+- **Undo**, for everything.
 
 ## Not planned
 
